@@ -1,10 +1,10 @@
-const express = require('express');
-const router = express.Router();
+// const express = require('express');
+// const router = express.Router();
 
-// Import the controller
-const { getActiveCoupons } = require('../controllers/Coupon/getAllCoupon');
+// // Import the controller
+// const { getActiveCoupons } = require('../controllers/coupon/getAllCoupon');
 
-// Route to get all active coupons
-router.get('/allcoupons', getActiveCoupons);  // Ensure route matches expected endpoint
+// // Route to get all active coupons
+// router.get('/allcoupons', getActiveCoupons); 
 
-module.exports = router;
+// module.exports = router;
