@@ -14,7 +14,6 @@ const Emergency = require('./routes/emergencyContacts');
 const Verification = require('./routes/verification');
 const Message = require('./routes/message');
 const Community = require('./routes/community');
-const Coupon = require('./routes/coupon');
 
 const app = express();
 
@@ -39,7 +38,6 @@ app.use('/api', Emergency);
 app.use('/api', Verification);
 app.use('/api', Message);
 app.use('/api', Community);
-app.use('/api', Coupon);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
