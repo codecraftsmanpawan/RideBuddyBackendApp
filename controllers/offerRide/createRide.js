@@ -8,7 +8,7 @@ exports.createRide = async (req, res) => {
         const { 
             sourceName, sourcePoint, addStopName, addStopPoints, destinationName, 
             destinationPoint, routes, tripDistance, tripDuration, pickupTime, pickupDate, 
-            noOfSeat, pricePerSeat, recurrence 
+            noOfSeat, pricePerSeat, recurrence, preferences, femaleOnly, markAsComplete 
         } = req.body;
 
         // Validate required fields
@@ -40,12 +40,10 @@ exports.createRide = async (req, res) => {
         }
 
         // Check if vehicle exists for the driver
-        const vehicles = await Vehicle.find({ driver });
-        if (vehicles.length === 0) {
-            return res.status(400).json({ message: 'No vehicle found for the user' });
+        const vehicle = await Vehicle.findOne({ driver });
+        if (!vehicle) {
+            return res.status(400).json({ message: 'No vehicle found for the driver' });
         }
-        const vehicle = vehicles[0];
-        const vehical = vehicle.id;
 
         // Create new ride
         const newRide = new Ride({
@@ -56,7 +54,7 @@ exports.createRide = async (req, res) => {
             addStopPoints,
             destinationName,
             destinationPoint,
-            vehical,
+            vehicle: vehicle.id,  // Use vehicle.id directly
             routes,
             tripDistance,
             tripDuration,
@@ -64,12 +62,16 @@ exports.createRide = async (req, res) => {
             pickupDate,
             noOfSeat,
             pricePerSeat,
-            recurrence: recurrenceData  // Add recurrence data if provided
+            recurrence: recurrenceData,  // Add recurrence data if provided
+            preferences: preferences || { smoking: false, pets: false, music: false },
+            femaleOnly: femaleOnly || false,
+            markAsComplete: markAsComplete || false
         });
 
         await newRide.save();
         res.status(201).json({ success: true, message: 'Ride created successfully', ride: newRide });
     } catch (error) {
+        console.error('Error creating ride:', error);  // Log the error with context
         res.status(500).json({ success: false, message: 'Failed to create ride', error: error.message });
     }
 };

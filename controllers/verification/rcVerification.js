@@ -44,7 +44,7 @@ const verifyRC = async (req, res) => {
     // Define the options for the API request
     const options = {
       method: 'POST',
-      url: 'https://prod.apiclub.in/api/v1/rc_info',
+      url: 'https://uat.apiclub.in/api/v1/rc_info',
       headers: {
         accept: 'application/json',
         'x-request-id': xRequestId,

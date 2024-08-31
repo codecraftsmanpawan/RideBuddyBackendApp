@@ -35,7 +35,7 @@ const DLverification = async (req, res) => {
     // Define the options for the API request
     const options = {
       method: 'POST',
-      url: 'https://prod.apiclub.in/api/v1/fetch_dl',
+      url: 'https://uat.apiclub.in/api/v1/fetch_dl',
       headers: {
         accept: 'application/json',
         'x-request-id': xRequestId,
