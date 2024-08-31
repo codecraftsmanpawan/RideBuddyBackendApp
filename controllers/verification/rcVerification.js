@@ -17,14 +17,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const crypto = require('crypto'); // Add crypto for generating random values
+
+// Utility function to generate an 8-digit xRequestId
+const generateXRequestId = () => {
+  return crypto.randomInt(10000000, 100000000).toString();
+};
+
 const verifyRC = async (req, res) => {
   // Extract the x-request-id, vehicleId, and profileId from the request body
-  const { xRequestId, vehicleId, profileId, vehicle_color, vehicle_fuel_type } = req.body;
+  let { xRequestId, vehicleId, profileId, vehicle_color, vehicle_fuel_type } = req.body;
+
+  // Generate xRequestId if not provided
+  if (!xRequestId) {
+    xRequestId = generateXRequestId();
+  }
 
   // Validate input
-  if (!xRequestId || !vehicleId || !profileId) {
+  if (!vehicleId || !profileId) {
     return res.status(400).json({
-      message: 'x-request-id, vehicleId, and profileId are required.'
+      message: 'vehicleId and profileId are required.'
     });
   }
 
@@ -32,7 +44,7 @@ const verifyRC = async (req, res) => {
     // Define the options for the API request
     const options = {
       method: 'POST',
-      url: 'https://prod.apiclub.in/api/v1/rc_info',
+      url: 'https://uat.apiclub.in/api/v1/rc_info',
       headers: {
         accept: 'application/json',
         'x-request-id': xRequestId,
@@ -157,6 +169,7 @@ const verifyRC = async (req, res) => {
     }
   }
 };
+
 // Define the controller function
 const deleteRC = async (req, res) => {
   // Extract the rcVerificationId and profileId from the request parameters or body

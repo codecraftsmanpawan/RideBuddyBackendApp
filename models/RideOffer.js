@@ -4,7 +4,8 @@ const RecurrenceSchema = require('./RecurrenceSchema');
 const RideSchema = new mongoose.Schema({
     driver: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Profile'
+        ref: 'Profile',
+        required: true
     },
     sourceName: {
         type: String,
@@ -13,7 +14,7 @@ const RideSchema = new mongoose.Schema({
     sourcePoint: {
         latitude: {
             type: String,
-            required: true,
+            required: true
         },
         longitude: {
             type: String,
@@ -38,7 +39,7 @@ const RideSchema = new mongoose.Schema({
     destinationPoint: {
         latitude: {
             type: String,
-            required: true,
+            required: true
         },
         longitude: {
             type: String,
@@ -81,11 +82,44 @@ const RideSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['scheduled', 'ongoing', 'cancelled', 'completed'],
-        default: 'pending'
+        default: 'scheduled'
     },
-    recurrence: RecurrenceSchema  
+    recurrence: RecurrenceSchema,
+    preferences: {
+        smoking: {
+            type: Boolean,
+            default: false
+        },
+        pets: {
+            type: Boolean,
+            default: false
+        },
+        music: {
+            type: Boolean,
+            default: false
+        }
+    },
+    femaleOnly: {
+        type: Boolean,
+        default: false
+    },
+    markAsComplete: {
+        type: Boolean,
+        default: false
+    },
+    markAsCompleteTime: {
+        type: Date
+    }
 });
 
-const Ride = mongoose.model('OfferRide', RideSchema);
+// Middleware to automatically set markAsCompleteTime when markAsComplete is set to true
+RideSchema.pre('save', function(next) {
+    if (this.markAsComplete && !this.markAsCompleteTime) {
+        this.markAsCompleteTime = Date.now();
+    }
+    next();
+});
+
+const Ride = mongoose.model('Ride', RideSchema);
 
 module.exports = Ride;

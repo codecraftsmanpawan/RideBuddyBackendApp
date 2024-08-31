@@ -4,20 +4,29 @@ const AadharVerification = require('../../models/AdharVerification'); // Adjust 
 const Profile = require('../../models/Profile'); // Add the Profile model
 
 // Controller function to send Aadhaar OTP
+
+// Utility function to generate an 8-digit random number
+const generateRequestId = () => {
+  return Math.floor(10000000 + Math.random() * 90000000).toString();
+};
+
 const sendAadharOtp = async (req, res) => {
-  const { aadhaar_no, request_id } = req.body;
+  const { aadhaar_no } = req.body;
+
+  // Generate a new request ID
+  const request_id = generateRequestId();
 
   // Validate input
-  if (!aadhaar_no || !request_id) {
-    return res.status(400).json({ message: 'Aadhaar number and request ID are required' });
+  if (!aadhaar_no) {
+    return res.status(400).json({ message: 'Aadhaar number is required', request_id });
   }
 
   const options = {
     method: 'POST',
-    url: 'https://prod.apiclub.in/api/v1/aadhaar_v2/send_otp',
+    url: 'https://uat.apiclub.in/api/v1/aadhaar_v2/send_otp',
     headers: {
       accept: 'application/json',
-      'x-request-id': request_id, 
+      'x-request-id': request_id, // Use generated request ID
       Referer: 'docs.apiclub.in',
       'content-type': 'application/json',
       'x-api-key': 'apclb_wMttXrEyW3xA0dul9FsuAMu41f32119e'
@@ -27,17 +36,25 @@ const sendAadharOtp = async (req, res) => {
 
   try {
     const response = await axios.request(options);
-    return res.status(response.status).json(response.data);
+    // Include the generated request ID in the response
+    return res.status(response.status).json({
+      ...response.data,
+      request_id
+    });
   } catch (error) {
     console.error('Error sending Aadhaar OTP:', error);
     return res.status(error.response ? error.response.status : 500).json({
       message: 'Failed to send OTP',
-      error: error.message
+      error: error.message,
+      request_id // Include the request ID in the error response as well
     });
   }
 };
 
 // Controller function to verify Aadhaar OTPconst axios
+// Utility function to check if a value is a valid ObjectId
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 const verifyAadharOtp = async (req, res) => {
   const { ref_id, otp, request_id, profileId } = req.body;
 
@@ -50,9 +67,15 @@ const verifyAadharOtp = async (req, res) => {
     return res.status(400).json({ message: 'Reference ID, OTP, request ID, and profile ID are required' });
   }
 
+  // Check if profileId is a valid ObjectId
+  if (!isValidObjectId(profileId)) {
+    console.log('Validation error: Invalid profile ID');
+    return res.status(400).json({ message: 'Invalid profile ID' });
+  }
+
   const options = {
     method: 'POST',
-    url: 'https://prod.apiclub.in/api/v1/aadhaar_v2/submit_otp',
+    url: 'https://uat.apiclub.in/api/v1/aadhaar_v2/submit_otp',
     headers: {
       accept: 'application/json',
       'x-request-id': request_id,
@@ -93,7 +116,7 @@ const verifyAadharOtp = async (req, res) => {
           zip_file: response.data.response.zip_file
         },
         profile: profileId, // Use profileId from request
-        data: response.data.request_id,
+        data: response.data.request_id, // Store request_id directly
         verified_at: new Date()
       };
 
@@ -138,6 +161,7 @@ const verifyAadharOtp = async (req, res) => {
     });
   }
 };
+
 
 // Define the controller function
 const deleteAadharVerification = async (req, res) => {

@@ -18,7 +18,7 @@ const bookRideSchema = new mongoose.Schema({
     },
     totalAmount: {
         type: Number,
-        required: true,
+        required: true
     },
     paymentStatus: {
         type: String,
@@ -56,7 +56,7 @@ const bookRideSchema = new mongoose.Schema({
     pickupPoint: {
         latitude: {
             type: String,
-            required: true,
+            required: true
         },
         longitude: {
             type: String,
@@ -70,13 +70,46 @@ const bookRideSchema = new mongoose.Schema({
     dropoffPoint: {
         latitude: {
             type: String,
-            required: true,
+            required: true
         },
         longitude: {
             type: String,
             required: true
         }
+    },
+    preferences: {
+        smoking: {
+            type: Boolean,
+            default: false
+        },
+        pets: {
+            type: Boolean,
+            default: false
+        },
+        music: {
+            type: Boolean,
+            default: false
+        }
+    },
+    femaleOnly: {
+        type: Boolean,
+        default: false
+    },
+    markAsComplete: {
+        type: Boolean,
+        default: false
+    },
+    rideCompleteDateTime: {
+        type: Date
     }
+});
+
+// Middleware to set rideCompleteDateTime when markAsComplete is set to true
+bookRideSchema.pre('save', function(next) {
+    if (this.markAsComplete && !this.rideCompleteDateTime) {
+        this.rideCompleteDateTime = Date.now();
+    }
+    next();
 });
 
 const BookRide = mongoose.model('BookRide', bookRideSchema);

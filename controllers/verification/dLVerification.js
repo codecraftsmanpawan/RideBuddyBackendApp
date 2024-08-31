@@ -2,10 +2,20 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 const DLVerification = require('../../models/DLVerification'); // Adjust the path as needed
 const Profile = require('../../models/Profile'); // Adjust the path as needed
+const crypto = require('crypto'); // Add crypto for generating random values
 
-// Define the controller function for DL verification
+// Utility function to generate an 8-digit xRequestId
+const generateXRequestId = () => {
+  return crypto.randomInt(10000000, 100000000).toString();
+};
+
 const DLverification = async (req, res) => {
-  const { dl_no, dob, xRequestId, profileId } = req.body;
+  let { dl_no, dob, xRequestId, profileId } = req.body;
+
+  // Generate xRequestId if not provided
+  if (!xRequestId) {
+    xRequestId = generateXRequestId();
+  }
 
   // Validate input
   if (!dl_no || !dob || !xRequestId || !profileId) {
@@ -25,7 +35,7 @@ const DLverification = async (req, res) => {
     // Define the options for the API request
     const options = {
       method: 'POST',
-      url: 'https://prod.apiclub.in/api/v1/fetch_dl',
+      url: 'https://uat.apiclub.in/api/v1/fetch_dl',
       headers: {
         accept: 'application/json',
         'x-request-id': xRequestId,
