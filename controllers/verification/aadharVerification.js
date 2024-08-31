@@ -23,7 +23,7 @@ const sendAadharOtp = async (req, res) => {
 
   const options = {
     method: 'POST',
-    url: 'https://uat.apiclub.in/api/v1/aadhaar_v2/send_otp',
+    url: 'https://prod.apiclub.in/api/v1/aadhaar_v2/send_otp',
     headers: {
       accept: 'application/json',
       'x-request-id': request_id, // Use generated request ID
@@ -75,7 +75,7 @@ const verifyAadharOtp = async (req, res) => {
 
   const options = {
     method: 'POST',
-    url: 'https://uat.apiclub.in/api/v1/aadhaar_v2/submit_otp',
+    url: 'https://prod.apiclub.in/api/v1/aadhaar_v2/submit_otp',
     headers: {
       accept: 'application/json',
       'x-request-id': request_id,
